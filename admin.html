@@ -83,10 +83,11 @@
 
         const formData = new FormData();
         formData.append('file', file);
-        // UPDATED: Ab ye aapke exact preset name 'Shoe-preset' se match karega
+        // EXACT NAME MATCH: 'Shoe-preset'
         formData.append('upload_preset', 'Shoe-preset'); 
 
         try {
+            // Uploading to dvkqzb7vi
             const res = await fetch('https://api.cloudinary.com/v1_1/dvkqzb7vi/image/upload', {
                 method: 'POST',
                 body: formData
@@ -105,10 +106,10 @@
                 });
                 
                 uploader.value = 100;
-                alert("Mubarak ho! Pehla Shoe Launch ho gaya.");
+                alert("Mubarak ho! Cloudinary se Pehla Shoe Launch ho gaya.");
                 location.reload();
             } else {
-                alert("Upload Fail: " + (result.error ? result.error.message : "Error"));
+                alert("Upload Error: " + (result.error ? result.error.message : "Preset Error"));
                 uploader.style.display = "none";
             }
         } catch (e) {
