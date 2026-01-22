@@ -39,20 +39,22 @@
 </section>
 
 <script>
+    // 1. Admin Security
     const pass = prompt("Enter Admin Password:");
     if (pass !== "uzzi123") {
         alert("Wrong Password!");
         window.location.href = "index.html";
     }
 
+    // 2. Firebase Database Setup
     const firebaseConfig = {
         apiKey: "AIzaSyDJQUk8VOVeGQJfZjgvB0odBswZ1qGKvpw",
         databaseURL: "https://shoeuzair2026-default-rtdb.firebaseio.com"
     };
-    
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    // 3. Show Products in Admin Panel
     window.onload = function() {
         database.ref('products').on('value', (snapshot) => {
             const display = document.getElementById('admin-post-display');
@@ -72,65 +74,7 @@
         });
     };
 
-    async function handleLaunch() {
-        const fileInput = document.getElementById('image-file-input');
-        const file = fileInput.files[0];
-        const name = document.getElementById('product-name').value;
-        const price = document.getElementById('product-price').value;
-        const uploader = document.getElementById('uploader');
-
-        if (!file || !name || !price) {
-            alert("Bhai, Details bharna zaroori hai!");
-            return;
-        }
-
-        uploader.style.display = "block";
-        uploader.value = 10;
-
-        const formData = new FormData();
-        formData.append('image', file);
-
-        try {
-            // NEW FRESH API KEY
-            const res = await fetch('https://api.imgbb.com/1/upload?key=6df7e052069792556554b4231b539c89', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await res.json();
-            
-            if (result.success) {
-                uploader.value = 70;
-                await database.ref('products').push({
-                    img: result.data.url,
-                    name: name,
-                    price: price,
-                    oldPrice: document.getElementById('product-old-price').value,
-                    detail: document.getElementById('product-detail').value,
-                    cat: document.getElementById('product-category').value
-                });
-                
-                uploader.value = 100;
-                alert("Mubarak ho! Product Live ho gaya.");
-                location.reload();
-            } else {
-                alert("ImgBB ne mana kar diya! Shayad image badi hai.");
-                uploader.style.display = "none";
-            }
-        } catch (e) {
-            alert("Internet Check Karein!");
-            uploader.style.display = "none";
-        }
-    }
-
-    function deleteProduct(id) {
-        if (confirm("Kiya aap waqai delete karna chahte hain?")) {
-            database.ref('products/' + id).remove();
-        }
-    }
-</script>
-
-</body>
-</html>
+    // 4. THE FIXED UPLOAD FUNCTION (Cloudinary API)
     async function handleLaunch() {
         const file = document.getElementById('image-file-input').files[0];
         const name = document.getElementById('product-name').value;
@@ -147,10 +91,10 @@
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', 'shoe_preset'); // Jo preset aapne banaya
+        formData.append('upload_preset', 'shoe_preset'); 
 
         try {
-            // Aapka Cloud Name 'dvkqzb7vi' yahan set hai
+            // Your Cloud Name 'dvkqzb7vi'
             const res = await fetch('https://api.cloudinary.com/v1_1/dvkqzb7vi/image/upload', {
                 method: 'POST',
                 body: formData
@@ -159,6 +103,7 @@
             
             if (result.secure_url) {
                 uploader.value = 80;
+                // Save to Firebase Database
                 await database.ref('products').push({
                     img: result.secure_url,
                     name: name,
@@ -172,7 +117,7 @@
                 alert("Mubarak ho! Pehla Shoe Cloudinary se Live ho gaya.");
                 location.reload();
             } else {
-                alert("Upload Fail! Check Preset: " + result.error.message);
+                alert("Upload Fail! Check Preset: " + (result.error ? result.error.message : "Error"));
                 uploader.style.display = "none";
             }
         } catch (e) {
@@ -180,4 +125,14 @@
             uploader.style.display = "none";
         }
     }
-    
+
+    // 5. Delete Function
+    function deleteProduct(id) {
+        if (confirm("Kiya aap waqai delete karna chahte hain?")) {
+            database.ref('products/' + id).remove();
+        }
+    }
+</script>
+
+</body>
+</html>
