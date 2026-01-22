@@ -10,17 +10,17 @@
 </head>
 <body>
 
-<section id="admin-panel" style="display:block; margin-top:20px;">
+<section id="admin-panel" style="display:block; margin-top:20px; padding:20px; font-family: sans-serif;">
     <div class="product-input">
         <h2 class="admin-title">Admin Dashboard</h2>
         <input type="file" id="image-file-input" accept="image/*">
         <progress value="0" max="100" id="uploader" style="display:none; width:100%; margin:10px 0;"></progress>
         
-        <input type="text" id="product-name" placeholder="Shoe Name">
-        <input type="text" id="product-detail" placeholder="Shoe Details">
+        <input type="text" id="product-name" placeholder="Shoe Name" style="width:100%; margin:5px 0; padding:10px;">
+        <input type="text" id="product-detail" placeholder="Shoe Details" style="width:100%; margin:5px 0; padding:10px;">
         <div class="price-inputs" style="display:flex; gap:5px;">
-            <input type="text" id="product-old-price" placeholder="Old Price">
-            <input type="text" id="product-price" placeholder="New Price">
+            <input type="text" id="product-old-price" placeholder="Old Price" style="flex:1; padding:10px;">
+            <input type="text" id="product-price" placeholder="New Price" style="flex:1; padding:10px;">
         </div>
         <select id="product-category" style="width:100%; padding:10px; margin:10px 0;">
             <option value="men">Men Shoes</option>
@@ -28,9 +28,10 @@
             <option value="children">Children Shoes</option>
         </select>
         <div class="admin-btns">
-            <button id="main-btn" class="launch-btn" onclick="handleLaunch()" style="width:100%; padding:15px; background:green; color:white; border:none; font-weight:bold; cursor:pointer;">Launch Product</button>
+            <button id="main-btn" class="launch-btn" onclick="handleLaunch()" style="width:100%; padding:15px; background:green; color:white; border:none; font-weight:bold; cursor:pointer; border-radius:5px;">Launch Product</button>
         </div>
     </div>
+    <hr style="margin:30px 0;">
     <div class="admin-control-area">
         <h3>Manage Your Posts</h3>
         <div id="admin-post-display"></div>
@@ -58,10 +59,13 @@
             snapshot.forEach((child) => {
                 const p = child.val();
                 display.innerHTML += `
-                    <div style="border:1px solid #ddd; padding:10px; margin:5px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
-                        <img src="${p.img}" width="50" style="border-radius:5px;">
-                        <span>${p.name}</span>
-                        <button onclick="deleteProduct('${child.key}')" style="background:red; color:white; border:none; padding:5px; border-radius:3px;">Delete</button>
+                    <div style="border:1px solid #ddd; padding:10px; margin:10px 0; display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; border-radius:8px;">
+                        <img src="${p.img}" width="60" style="border-radius:5px;">
+                        <div style="flex:1; margin-left:10px;">
+                            <strong>${p.name}</strong><br>
+                            <small>Rs. ${p.price}</small>
+                        </div>
+                        <button onclick="deleteProduct('${child.key}')" style="background:red; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Delete</button>
                     </div>`;
             });
         });
@@ -83,11 +87,11 @@
 
         const formData = new FormData();
         formData.append('file', file);
-        // EXACT NAME MATCH: 'Shoe-preset'
+        // MATCHED WITH YOUR SCREENSHOT: Shoe-preset
         formData.append('upload_preset', 'Shoe-preset'); 
 
         try {
-            // Uploading to dvkqzb7vi
+            // Your Cloud Name: dvkqzb7vi
             const res = await fetch('https://api.cloudinary.com/v1_1/dvkqzb7vi/image/upload', {
                 method: 'POST',
                 body: formData
@@ -104,12 +108,11 @@
                     detail: document.getElementById('product-detail').value,
                     cat: document.getElementById('product-category').value
                 });
-                
                 uploader.value = 100;
-                alert("Mubarak ho! Cloudinary se Pehla Shoe Launch ho gaya.");
+                alert("Mubarak ho! Shoe Cloudinary se Live ho gaya.");
                 location.reload();
             } else {
-                alert("Upload Error: " + (result.error ? result.error.message : "Preset Error"));
+                alert("Upload Fail! Check Preset: " + (result.error ? result.error.message : "Error"));
                 uploader.style.display = "none";
             }
         } catch (e) {
@@ -119,7 +122,7 @@
     }
 
     function deleteProduct(id) {
-        if (confirm("Delete karna hai?")) {
+        if (confirm("Kiya aap waqai delete karna chahte hain?")) {
             database.ref('products/' + id).remove();
         }
     }
