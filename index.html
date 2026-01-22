@@ -1,4 +1,4 @@
-                <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -79,7 +79,7 @@
 </div>
 
 <script>
-    // 1. Firebase Configuration
+    // 1. Firebase Configuration (Kept Same)
     const firebaseConfig = {
         apiKey: "AIzaSyDJQUk8VOVeGQJfZjgvB0odBswZ1qGKvpw",
         databaseURL: "https://shoeuzair2026-default-rtdb.firebaseio.com"
@@ -88,7 +88,7 @@
     const database = firebase.database();
     let allProducts = [];
 
-    // 2. Load Data from Firebase on Load
+    // 2. Load Data from Firebase
     window.onload = () => {
         database.ref('products').on('value', (snapshot) => {
             allProducts = [];
@@ -99,7 +99,7 @@
         });
     };
 
-    // 3. Render Items to Screen
+    // 3. Render Items (Cloudinary Image URL Support)
     function renderItems(list) {
         const container = document.getElementById('post-container');
         if(!container) return;
@@ -107,7 +107,7 @@
         list.forEach(p => {
             container.innerHTML += `
                 <div class="product-card">
-                    <img src="${p.img}">
+                    <img src="${p.img}" alt="${p.name}">
                     <b class="p-name">${p.name}</b>
                     <p class="p-detail-text">${p.detail || ""}</p>
                     <div class="price-box">
