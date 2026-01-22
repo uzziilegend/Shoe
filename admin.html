@@ -1,4 +1,4 @@
-              <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -38,23 +38,20 @@
 </section>
 
 <script>
-    // 1. Password Check
     const pass = prompt("Enter Admin Password:");
     if (pass !== "uzzi123") {
         alert("Wrong Password!");
         window.location.href = "index.html";
     }
 
-    // 2. Firebase Init
     const firebaseConfig = {
         apiKey: "AIzaSyDJQUk8VOVeGQJfZjgvB0odBswZ1qGKvpw",
         databaseURL: "https://shoeuzair2026-default-rtdb.firebaseio.com"
     };
     
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    var database = firebase.database();
 
-    // 3. Display Function
     window.onload = function() {
         database.ref('products').on('value', (snapshot) => {
             const display = document.getElementById('admin-post-display');
@@ -63,66 +60,59 @@
                 const p = child.val();
                 display.innerHTML += `
                     <div style="border:1px solid #ddd; padding:10px; margin:5px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
-                        <img src="${p.img}" width="50" style="border-radius:5px;">
+                        <img src="${p.img}" width="50">
                         <span>${p.name}</span>
-                        <button onclick="deleteProduct('${child.key}')" style="background:red; color:white; border:none; padding:5px; border-radius:3px;">Delete</button>
+                        <button onclick="deleteProduct('${child.key}')" style="background:red; color:white; border:none; padding:5px;">Delete</button>
                     </div>`;
             });
         });
     };
 
-    // 4. FIXED UPLOAD FUNCTION
     async function handleLaunch() {
-        const fileInput = document.getElementById('image-file-input');
-        const file = fileInput.files[0];
+        const file = document.getElementById('image-file-input').files[0];
         const name = document.getElementById('product-name').value;
         const price = document.getElementById('product-price').value;
         const uploader = document.getElementById('uploader');
 
         if (!file || !name || !price) {
-            alert("Bhai, Photo, Naam aur Price bharna zaroori hai!");
+            alert("Bhai, Details bharein!");
             return;
         }
 
         uploader.style.display = "block";
-        uploader.value = 10;
+        uploader.value = 20;
 
         const formData = new FormData();
         formData.append('image', file);
 
         try {
             // ImgBB Upload
-            const res = await fetch('https://api.imgbb.com/1/upload?key=1dfb494d95e25e1d30a22dd1222127f1', {
+            const response = await fetch('https://api.imgbb.com/1/upload?key=1dfb494d95e25e1d30a22dd1222127f1', {
                 method: 'POST',
                 body: formData
             });
-            const result = await res.json();
-            
+            const result = await response.json();
+
             if (result.success) {
-                uploader.value = 60;
+                uploader.value = 70;
                 // Save to Firebase
-                database.ref('products').push({
+                await database.ref('products').push({
                     img: result.data.url,
                     name: name,
                     price: price,
                     oldPrice: document.getElementById('product-old-price').value,
                     detail: document.getElementById('product-detail').value,
                     cat: document.getElementById('product-category').value
-                }, (error) => {
-                    if (error) {
-                        alert("Firebase Save Error: " + error.message);
-                    } else {
-                        uploader.value = 100;
-                        alert("Mubarak ho! Shoe Launch Ho Gaya.");
-                        location.reload();
-                    }
                 });
+                uploader.value = 100;
+                alert("Mubarak ho! Product Launch ho gaya.");
+                location.reload();
             } else {
-                alert("ImgBB Upload Fail!");
-                uploader.style.display = "none";
+                alert("Upload Error!");
             }
-        } catch (e) {
-            alert("Internet ka masla hai!");
+        } catch (err) {
+            alert("Internet Error!");
+        } finally {
             uploader.style.display = "none";
         }
     }
