@@ -131,3 +131,53 @@
 
 </body>
 </html>
+    async function handleLaunch() {
+        const file = document.getElementById('image-file-input').files[0];
+        const name = document.getElementById('product-name').value;
+        const price = document.getElementById('product-price').value;
+        const uploader = document.getElementById('uploader');
+
+        if (!file || !name || !price) {
+            alert("Bhai, Details bharna zaroori hai!");
+            return;
+        }
+
+        uploader.style.display = "block";
+        uploader.value = 20;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'shoe_preset'); // Jo preset aapne banaya
+
+        try {
+            // Aapka Cloud Name 'dvkqzb7vi' yahan set hai
+            const res = await fetch('https://api.cloudinary.com/v1_1/dvkqzb7vi/image/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
+            
+            if (result.secure_url) {
+                uploader.value = 80;
+                await database.ref('products').push({
+                    img: result.secure_url,
+                    name: name,
+                    price: price,
+                    oldPrice: document.getElementById('product-old-price').value,
+                    detail: document.getElementById('product-detail').value,
+                    cat: document.getElementById('product-category').value
+                });
+                
+                uploader.value = 100;
+                alert("Mubarak ho! Pehla Shoe Cloudinary se Live ho gaya.");
+                location.reload();
+            } else {
+                alert("Upload Fail! Check Preset: " + result.error.message);
+                uploader.style.display = "none";
+            }
+        } catch (e) {
+            alert("Internet Check Karein!");
+            uploader.style.display = "none";
+        }
+    }
+    
