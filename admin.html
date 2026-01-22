@@ -10,17 +10,17 @@
 </head>
 <body>
 
-<section id="admin-panel" style="display:block; margin-top:20px; padding:20px; font-family: sans-serif;">
+<section id="admin-panel" style="display:block; margin-top:20px;">
     <div class="product-input">
         <h2 class="admin-title">Admin Dashboard</h2>
         <input type="file" id="image-file-input" accept="image/*">
         <progress value="0" max="100" id="uploader" style="display:none; width:100%; margin:10px 0;"></progress>
         
-        <input type="text" id="product-name" placeholder="Shoe Name" style="width:100%; margin:5px 0; padding:10px;">
-        <input type="text" id="product-detail" placeholder="Shoe Details" style="width:100%; margin:5px 0; padding:10px;">
+        <input type="text" id="product-name" placeholder="Shoe Name">
+        <input type="text" id="product-detail" placeholder="Shoe Details">
         <div class="price-inputs" style="display:flex; gap:5px;">
-            <input type="text" id="product-old-price" placeholder="Old Price" style="flex:1; padding:10px;">
-            <input type="text" id="product-price" placeholder="New Price" style="flex:1; padding:10px;">
+            <input type="text" id="product-old-price" placeholder="Old Price">
+            <input type="text" id="product-price" placeholder="New Price">
         </div>
         <select id="product-category" style="width:100%; padding:10px; margin:10px 0;">
             <option value="men">Men Shoes</option>
@@ -28,10 +28,9 @@
             <option value="children">Children Shoes</option>
         </select>
         <div class="admin-btns">
-            <button id="main-btn" class="launch-btn" onclick="handleLaunch()" style="width:100%; padding:15px; background:green; color:white; border:none; font-weight:bold; cursor:pointer; border-radius:5px;">Launch Product</button>
+            <button id="main-btn" class="launch-btn" onclick="handleLaunch()" style="width:100%; padding:15px; background:green; color:white; border:none; font-weight:bold; cursor:pointer;">Launch Product</button>
         </div>
     </div>
-    <hr style="margin:30px 0;">
     <div class="admin-control-area">
         <h3>Manage Your Posts</h3>
         <div id="admin-post-display"></div>
@@ -39,22 +38,23 @@
 </section>
 
 <script>
-    // 1. Admin Security
+    // 1. Password Check
     const pass = prompt("Enter Admin Password:");
     if (pass !== "uzzi123") {
         alert("Wrong Password!");
         window.location.href = "index.html";
     }
 
-    // 2. Firebase Database Setup
+    // 2. Firebase Init
     const firebaseConfig = {
         apiKey: "AIzaSyDJQUk8VOVeGQJfZjgvB0odBswZ1qGKvpw",
         databaseURL: "https://shoeuzair2026-default-rtdb.firebaseio.com"
     };
+    
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // 3. Show Products in Admin Panel
+    // 3. Display Function
     window.onload = function() {
         database.ref('products').on('value', (snapshot) => {
             const display = document.getElementById('admin-post-display');
@@ -62,27 +62,25 @@
             snapshot.forEach((child) => {
                 const p = child.val();
                 display.innerHTML += `
-                    <div style="border:1px solid #ddd; padding:10px; margin:10px 0; display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; border-radius:8px;">
-                        <img src="${p.img}" width="60" style="border-radius:5px;">
-                        <div style="flex:1; margin-left:10px;">
-                            <strong>${p.name}</strong><br>
-                            <small>Rs. ${p.price}</small>
-                        </div>
-                        <button onclick="deleteProduct('${child.key}')" style="background:red; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Delete</button>
+                    <div style="border:1px solid #ddd; padding:10px; margin:5px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
+                        <img src="${p.img}" width="50" style="border-radius:5px;">
+                        <span>${p.name}</span>
+                        <button onclick="deleteProduct('${child.key}')" style="background:red; color:white; border:none; padding:5px; border-radius:3px;">Delete</button>
                     </div>`;
             });
         });
     };
 
-    // 4. THE FIXED UPLOAD FUNCTION (Cloudinary API)
+    // 4. CLOUDINARY UPLOAD FUNCTION
     async function handleLaunch() {
-        const file = document.getElementById('image-file-input').files[0];
+        const fileInput = document.getElementById('image-file-input');
+        const file = fileInput.files[0];
         const name = document.getElementById('product-name').value;
         const price = document.getElementById('product-price').value;
         const uploader = document.getElementById('uploader');
 
         if (!file || !name || !price) {
-            alert("Bhai, Details bharna zaroori hai!");
+            alert("Bhai, Photo, Naam aur Price bharna zaroori hai!");
             return;
         }
 
@@ -94,7 +92,7 @@
         formData.append('upload_preset', 'shoe_preset'); 
 
         try {
-            // Your Cloud Name 'dvkqzb7vi'
+            // Cloudinary API Link with your Cloud Name
             const res = await fetch('https://api.cloudinary.com/v1_1/dvkqzb7vi/image/upload', {
                 method: 'POST',
                 body: formData
@@ -102,33 +100,36 @@
             const result = await res.json();
             
             if (result.secure_url) {
-                uploader.value = 80;
-                // Save to Firebase Database
-                await database.ref('products').push({
+                uploader.value = 70;
+                // Save to Firebase
+                database.ref('products').push({
                     img: result.secure_url,
                     name: name,
                     price: price,
                     oldPrice: document.getElementById('product-old-price').value,
                     detail: document.getElementById('product-detail').value,
                     cat: document.getElementById('product-category').value
+                }, (error) => {
+                    if (error) {
+                        alert("Firebase Error: " + error.message);
+                    } else {
+                        uploader.value = 100;
+                        alert("Mubarak ho! Shoe Cloudinary se Launch ho gaya.");
+                        location.reload();
+                    }
                 });
-                
-                uploader.value = 100;
-                alert("Mubarak ho! Pehla Shoe Cloudinary se Live ho gaya.");
-                location.reload();
             } else {
-                alert("Upload Fail! Check Preset: " + (result.error ? result.error.message : "Error"));
+                alert("Upload Fail! Check if preset is 'Unsigned' in Cloudinary.");
                 uploader.style.display = "none";
             }
         } catch (e) {
-            alert("Internet Check Karein!");
+            alert("Internet ka masla hai!");
             uploader.style.display = "none";
         }
     }
 
-    // 5. Delete Function
     function deleteProduct(id) {
-        if (confirm("Kiya aap waqai delete karna chahte hain?")) {
+        if (confirm("Delete karna hai?")) {
             database.ref('products/' + id).remove();
         }
     }
