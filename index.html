@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Store - Official</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<header id="web-design">
+    <div class="header-main">
+        <h2 class="side-menu" onclick="toggleMenu()"> ☰ </h2>
+        <h1 class="web-name">YOUR STORE</h1> 
+        <div class="header-spacer"></div> 
+    </div>
+    <div class="search-box">
+        <input id="search-bar" type="text" onkeyup="searchProduct()" placeholder="Search products...">
+    </div>
+</header>
+
+<section id="web-display">
+    <div class="view-menu">
+        <button class="close-btn" onclick="toggleMenu()">×</button>
+        <h3>Categories</h3>
+        <button onclick="handleMenuClick('all')"> All Collection </button>
+        <button onclick="handleMenuClick('men')">Men Shoe</button>
+        <button onclick="handleMenuClick('women')">Women Shoe</button>
+        <button onclick="handleMenuClick('children')">Children Shoe</button> 
+    </div>
+
+    <section id="post-container" class="product-grid"></section>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Customer Care</h3>
+                <button onclick="transferToMain()" class="footer-link">Terms & Conditions</button>
+                <button onclick="transferPrivacyToMain()" class="footer-link">Privacy Policy</button>
+                <button onclick="transferDeliveryToMain()" class="footer-link">Delivery & Returns</button>
+            </div>
+            
+            <div id="social-links" class="footer-section">
+                <h3>Follow Us</h3>
+                <a href="https://www.facebook.com/uzziilegend/" target="_blank"> Facebook </a> <br>
+                <a href="https://www.instagram.com/uzair_legend_01?igsh=MWY5ZmxpaGswazA4Yg==" target="_blank"> Instagram </a> <br>
+                <a href="https://www.tiktok.com/@uzair_legend_01?_t=ZS-8tHAnXfC7T1&_r=1" target="_blank"> Tik Tok </a> <br>
+                <a href="https://www.snapchat.com/add/uzziilegend1" target="_blank"> Snap Chat </a> <br>
+                <a href="https://wa.me/03112818853" target="_blank"> Whatsapp </a>
+            </div>
+        </div>
+    </footer>
+</section>
+
+<div id="temp-terms" class="hidden-content" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:1000; overflow-y:auto; padding:20px;">
+    <div class="terms-content-wrapper">
+        <h2>Terms & Conditions</h2><hr>
+        <p>Welcome to Your Store. By accessing and using this website, you agree to our terms and conditions.</p>
+        <button onclick="closePopups()" class="back-btn">← Back to Shop</button>
+    </div>
+</div>
+
+<div id="temp-privacy" class="hidden-content" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:1000; overflow-y:auto; padding:20px;">
+    <div class="terms-content-wrapper">
+        <h2>Privacy Policy</h2><hr>
+        <p>Your privacy is important to us. Your data is protected.</p>
+        <button onclick="closePopups()" class="back-btn">← Back to Shop</button>
+    </div>
+</div>
+
+<div id="temp-delivery" class="hidden-content" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:1000; overflow-y:auto; padding:20px;">
+    <div class="terms-content-wrapper">
+        <h2>Delivery & Returns</h2><hr>
+        <p>Fast delivery within 3-5 days across Pakistan.</p>
+        <button onclick="closePopups()" class="back-btn">← Back to Shop</button>
+    </div>
+</div>
+
+<script>
+    // 1. Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDJQUk8VOVeGQJfZjgvB0odBswZ1qGKvpw",
+        databaseURL: "https://shoeuzair2026-default-rtdb.firebaseio.com"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    let allProducts = [];
+
+    // 2. Load Data from Firebase on Load
+    window.onload = () => {
+        database.ref('products').on('value', (snapshot) => {
+            allProducts = [];
+            snapshot.forEach((child) => {
+                allProducts.push({ id: child.key, ...child.val() });
+            });
+            renderItems(allProducts);
+        });
+    };
+
+    // 3. Render Items to Screen
+    function renderItems(list) {
+        const container = document.getElementById('post-container');
+        if(!container) return;
+        container.innerHTML = "";
+        list.forEach(p => {
+            container.innerHTML += `
+                <div class="product-card">
+                    <img src="${p.img}">
+                    <b class="p-name">${p.name}</b>
+                    <p class="p-detail-text">${p.detail || ""}</p>
+                    <div class="price-box">
+                        ${p.oldPrice ? `<span class="old-p">Rs ${p.oldPrice}</span>` : ""}
+                        <span class="new-p">Rs ${p.price}</span>
+                    </div>
+                </div>`;
+        });
+    }
+
+    // 4. Search Functionality
+    function searchProduct() {
+        let q = document.getElementById('search-bar').value.toLowerCase();
+        let filtered = allProducts.filter(p => p.name.toLowerCase().includes(q));
+        renderItems(filtered);
+    }
+
+    // 5. Category Filter
+    function handleMenuClick(category) {
+        if(category === 'all') renderItems(allProducts);
+        else renderItems(allProducts.filter(p => p.cat === category));
+        toggleMenu();
+    }
+
+    // 6. Sidebar Menu Toggle
+    function toggleMenu() {
+        let m = document.querySelector(".view-menu");
+        m.style.display = (m.style.display === "block") ? "none" : "block";
+    }
+
+    // 7. Popup Controls
+    function transferToMain() { document.getElementById('temp-terms').style.display = 'block'; }
+    function transferPrivacyToMain() { document.getElementById('temp-privacy').style.display = 'block'; }
+    function transferDeliveryToMain() { document.getElementById('temp-delivery').style.display = 'block'; }
+    function closePopups() {
+        document.getElementById('temp-terms').style.display = 'none';
+        document.getElementById('temp-privacy').style.display = 'none';
+        document.getElementById('temp-delivery').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

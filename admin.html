@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<section id="admin-panel" style="display:block; margin-top:20px;">
+    <div class="product-input">
+        <h2 class="admin-title">Admin Dashboard</h2>
+        <input type="file" id="image-file-input" accept="image/*">
+        <progress value="0" max="100" id="uploader" style="display:none; width:100%; margin:10px 0;"></progress>
+        
+        <input type="text" id="product-name" placeholder="Shoe Name">
+        <input type="text" id="product-detail" placeholder="Shoe Details">
+        <div class="price-inputs" style="display:flex; gap:5px;">
+            <input type="text" id="product-old-price" placeholder="Old Price">
+            <input type="text" id="product-price" placeholder="New Price">
+        </div>
+        <select id="product-category" style="width:100%; padding:10px; margin:10px 0;">
+            <option value="men">Men Shoes</option>
+            <option value="women">Women Shoes</option>
+            <option value="children">Children Shoes</option>
+        </select>
+        <div class="admin-btns">
+            <button id="main-btn" class="launch-btn" onclick="handleLaunch()" style="width:100%; padding:15px; background:green; color:white; border:none; font-weight:bold; cursor:pointer;">Launch Product</button>
+        </div>
+    </div>
+    <div class="admin-control-area">
+        <h3>Manage Your Posts</h3>
+        <div id="admin-post-display"></div>
+    </div>
+</section>
+
+<script>
+    // 1. Password Check
+    const pass = prompt("Enter Admin Password:");
+    if (pass !== "uzzi123") {
+        alert("Wrong Password!");
+        window.location.href = "index.html";
+    }
+
+    // 2. Firebase Init
+    const firebaseConfig = {
+        apiKey: "AIzaSyDJQUk8VOVeGQJfZjgvB0odBswZ1qGKvpw",
+        databaseURL: "https://shoeuzair2026-default-rtdb.firebaseio.com"
+    };
+    
+    // Check if Firebase is loaded
+    if (typeof firebase !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+        console.log("Firebase Connected!");
+    } else {
+        alert("Firebase load nahi ho raha! Internet check karein.");
+    }
+
+    // 3. Display Function
+    window.onload = function() {
+        database.ref('products').on('value', (snapshot) => {
+            const display = document.getElementById('admin-post-display');
+            display.innerHTML = "";
+            snapshot.forEach((child) => {
+                const p = child.val();
+                display.innerHTML += `
+                    <div style="border:1px solid #ddd; padding:10px; margin:5px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
+                        <img src="${p.img}" width="50">
+                        <span>${p.name}</span>
+                        <button onclick="deleteProduct('${child.key}')" style="background:red; color:white; border:none; padding:5px;">Delete</button>
+                    </div>`;
+            });
+        });
+    };
+
+    // 4. MAIN UPLOAD FUNCTION (Handle Launch)
+    async function handleLaunch() {
+        const file = document.getElementById('image-file-input').files[0];
+        const name = document.getElementById('product-name').value;
+        const price = document.getElementById('product-price').value;
+        const uploader = document.getElementById('uploader');
+
+        if (!file || !name || !price) {
+            alert("Bhai, Photo, Naam aur Price lazmi hain!");
+            return;
+        }
+
+        uploader.style.display = "block";
+        uploader.value = 20;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            // ImgBB Upload
+            const response = await fetch('https://api.imgbb.com/1/upload?key=1dfb494d95e25e1d30a22dd1222127f1', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                uploader.value = 70;
+                // Save to Firebase
+                await database.ref('products').push({
+                    img: result.data.url,
+                    name: name,
+                    price: price,
+                    oldPrice: document.getElementById('product-old-price').value,
+                    detail: document.getElementById('product-detail').value,
+                    cat: document.getElementById('product-category').value
+                });
+                uploader.value = 100;
+                alert("Mubarak ho! Product Launch ho gaya.");
+                location.reload();
+            } else {
+                alert("ImgBB Upload Fail: " + result.error.message);
+            }
+        } catch (err) {
+            alert("Error: " + err.message);
+        } finally {
+            uploader.style.display = "none";
+        }
+    }
+
+    function deleteProduct(id) {
+        if (confirm("Delete karna hai?")) {
+            database.ref('products/' + id).remove();
+        }
+    }
+</script>
+
+</body>
+</html>

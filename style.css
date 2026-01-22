@@ -1,0 +1,178 @@
+import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Poppins:wght@300;400;600&display=swap');
+
+/* Basic Setup */
+* { box-sizing: border-box; font-family: 'Poppins', sans-serif; transition: 0.3s; }
+body { margin: 0; padding: 0; background-color: #f8f8f8; text-align: center; color: #333; }
+
+/* Header & Search - Aapki Original Classes */
+#web-design { background: linear-gradient(to right, #00a2ed, #0081bc); padding: 20px 0; color: white; position: sticky; top: 0; z-index: 1000; }
+.header-main { display: flex; align-items: center; justify-content: center; position: relative; max-width: 600px; margin: 0 auto; }
+.web-name { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
+.side-menu { position: absolute; left: 15px; font-size: 26px; cursor: pointer; }
+
+#search-bar { 
+    width: 90%; max-width: 450px; padding: 12px 20px; 
+    border-radius: 30px; border: none; margin-top: 15px; 
+    outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Category Menu */
+.view-menu { 
+    display: none; position: fixed; top: 0; left: 0; height: 100%; width: 260px; 
+    background: white; z-index: 2000; padding: 30px 20px; text-align: left; 
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2); 
+}
+.view-menu h3 { color: #00a2ed; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+.view-menu button { 
+    display: block; width: 100%; padding: 12px; margin: 10px 0; 
+    border: none; background: #f1f1f1; cursor: pointer; border-radius: 8px; 
+    font-weight: 500; text-align: left;
+}
+.view-menu button:hover { background: #00a2ed; color: white; }
+.close-btn { position: absolute; right: 15px; top: 10px; font-size: 25px; background: none !important; color: #333 !important; width: auto !important; }
+
+/* Product Grid (Main Display Area) */
+.product-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+    gap: 15px; padding: 20px; max-width: 1200px; margin: 0 auto; 
+}
+
+/* Product Card - Professional Touch */
+.product-card { 
+    background: white; padding: 12px; border-radius: 12px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center;
+}
+.product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+.product-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
+.p-name { display: block; font-size: 14px; font-weight: 600; margin-top: 10px; color: #222; }
+.p-detail-text { font-size: 11px; color: #777; margin: 5px 0; height: 32px; overflow: hidden; }
+
+/* Price Styling */
+.price-box { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 8px; }
+.new-p { color: #28a745; font-weight: bold; font-size: 16px; }
+.old-p { text-decoration: line-through; color: #999; font-size: 12px; }
+
+/* Footer Design */
+footer { background: #222; color: white; padding: 40px 20px; margin-top: 40px; }
+.footer-container { display: flex; flex-wrap: wrap; justify-content: space-around; max-width: 1000px; margin: 0 auto; }
+.footer-section { margin-bottom: 25px; min-width: 150px; }
+.footer-section h3 { font-size: 18px; margin-bottom: 15px; color: #00a2ed; }
+.footer-link { 
+    background: none; border: none; color: #ccc; display: block; 
+    margin: 8px auto; cursor: pointer; font-size: 14px; 
+}
+.footer-link:hover { color: white; text-decoration: underline; }
+
+/* Social Links */
+#social-links a { 
+    color: white !important; text-decoration: none !important; 
+    display: block; margin: 10px 0; font-size: 14px; 
+}
+#social-links a:hover { color: #00a2ed !important; }
+
+/* Popups (Original Hidden Content) */
+.hidden-content { 
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: white; z-index: 3000; overflow-y: auto; padding: 20px; 
+}
+.terms-content-wrapper { max-width: 600px; margin: 40px auto; text-align: left; }
+.back-btn { 
+    background: #00a2ed; color: white; border: none; padding: 12px 25px; 
+    border-radius: 5px; cursor: pointer; margin-top: 20px; font-weight: 600; 
+}
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+    .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
+    .web-name { font-size: 18px; }
+}
+
+/* Admin Panel Container */
+#admin-panel {
+    background: #ffffff;
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.admin-title {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Inputs Styling */
+.product-input input, 
+.product-input select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.product-input input:focus {
+    border-color: #00a2ed;
+    box-shadow: 0 0 5px rgba(0,162,237,0.2);
+}
+
+/* Price Inputs (Side by Side) */
+.price-inputs {
+    display: flex;
+    gap: 10px;
+}
+
+.price-inputs input {
+    flex: 1;
+}
+
+/* Buttons Styling */
+.admin-btns {
+    margin-top: 15px;
+}
+
+.launch-btn {
+    width: 100%;
+    padding: 15px;
+    background: #008000; /* Green color from your screenshot */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.launch-btn:hover {
+    background: #006400;
+    transform: translateY(-2px);
+}
+
+.update-btn {
+    width: 100%;
+    padding: 12px;
+    background: #00a2ed;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+/* Progress Bar */
+#uploader {
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    margin-bottom: 10px;
+}
