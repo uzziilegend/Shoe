@@ -38,23 +38,19 @@
 </section>
 
 <script>
-    // 1. Password Check
     const pass = prompt("Enter Admin Password:");
     if (pass !== "uzzi123") {
         alert("Wrong Password!");
         window.location.href = "index.html";
     }
 
-    // 2. Firebase Init
     const firebaseConfig = {
         apiKey: "AIzaSyDJQUk8VOVeGQJfZjgvB0odBswZ1qGKvpw",
         databaseURL: "https://shoeuzair2026-default-rtdb.firebaseio.com"
     };
-    
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // 3. Display Function
     window.onload = function() {
         database.ref('products').on('value', (snapshot) => {
             const display = document.getElementById('admin-post-display');
@@ -71,16 +67,14 @@
         });
     };
 
-    // 4. CLOUDINARY UPLOAD FUNCTION
     async function handleLaunch() {
-        const fileInput = document.getElementById('image-file-input');
-        const file = fileInput.files[0];
+        const file = document.getElementById('image-file-input').files[0];
         const name = document.getElementById('product-name').value;
         const price = document.getElementById('product-price').value;
         const uploader = document.getElementById('uploader');
 
         if (!file || !name || !price) {
-            alert("Bhai, Photo, Naam aur Price bharna zaroori hai!");
+            alert("Bhai, Details bharna zaroori hai!");
             return;
         }
 
@@ -89,10 +83,10 @@
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', 'shoe_preset'); 
+        // UPDATED: Ab ye aapke exact preset name 'Shoe-preset' se match karega
+        formData.append('upload_preset', 'Shoe-preset'); 
 
         try {
-            // Cloudinary API Link with your Cloud Name
             const res = await fetch('https://api.cloudinary.com/v1_1/dvkqzb7vi/image/upload', {
                 method: 'POST',
                 body: formData
@@ -100,30 +94,25 @@
             const result = await res.json();
             
             if (result.secure_url) {
-                uploader.value = 70;
-                // Save to Firebase
-                database.ref('products').push({
+                uploader.value = 80;
+                await database.ref('products').push({
                     img: result.secure_url,
                     name: name,
                     price: price,
                     oldPrice: document.getElementById('product-old-price').value,
                     detail: document.getElementById('product-detail').value,
                     cat: document.getElementById('product-category').value
-                }, (error) => {
-                    if (error) {
-                        alert("Firebase Error: " + error.message);
-                    } else {
-                        uploader.value = 100;
-                        alert("Mubarak ho! Shoe Cloudinary se Launch ho gaya.");
-                        location.reload();
-                    }
                 });
+                
+                uploader.value = 100;
+                alert("Mubarak ho! Pehla Shoe Launch ho gaya.");
+                location.reload();
             } else {
-                alert("Upload Fail! Check if preset is 'Unsigned' in Cloudinary.");
+                alert("Upload Fail: " + (result.error ? result.error.message : "Error"));
                 uploader.style.display = "none";
             }
         } catch (e) {
-            alert("Internet ka masla hai!");
+            alert("Internet Check Karein!");
             uploader.style.display = "none";
         }
     }
